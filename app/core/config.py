@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pydantic import Field, computed_field
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -16,7 +16,6 @@ class AppSettings(BaseSettings):
     POSTGRES_PORT: str = ""
     POSTGRES_DB: str = ""
 
-    @computed_field  # type: ignore[prop-decorator]
     @property
     def POSTGRES_URL(self) -> str:
         return (
