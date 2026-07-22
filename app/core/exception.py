@@ -31,6 +31,12 @@ class NotFoundError(AppError):
     status = status.HTTP_404_NOT_FOUND
 
 
+class ConflictError(AppError):
+    """Raised when a conflict occurs."""
+
+    status = status.HTTP_409_CONFLICT
+
+
 async def _app_error_handler(request: Request, exc: Exception) -> JSONResponse:
     error = exc if isinstance(exc, AppError) else AppError()
     return JSONResponse(

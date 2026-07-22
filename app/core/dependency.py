@@ -6,14 +6,22 @@ from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import SessionLocal
+from app.core.database import AsyncSessionLocal
 from app.core.exception import UnauthorizedError
 from app.core.security import bearer_scheme, decode_access_token
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    async with SessionLocal() as session:
-        yield session
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+
+
+AsyncSessionDep = Annotated[AsyncSession, Depends(get_db)]
 
 
 async def get_current_user(
@@ -28,3 +36,6 @@ async def get_current_user(
         raise UnauthorizedError(detail="Token has expired") from None
     except jwt.PyJWTError:
         raise UnauthorizedError() from None
+
+
+CurrentUserDep = Annotated[dict[str, Any], Depends(get_current_user)]

@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 from app.core.exception import add_exception_handlers
 from app.middleware import register_middlewares
+from app.modules.users.model import User  # noqa: F401
 from app.router import master_router
 
 # ANSI color helpers
