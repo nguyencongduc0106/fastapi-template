@@ -4,21 +4,18 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from app.core.exception import add_exception_handlers
+from app.core.logging import RED, RESET, YELLOW
+from app.core.redis import close_redis, init_redis
 from app.middleware import register_middlewares
-from app.modules.users.model import User  # noqa: F401
 from app.router import master_router
-
-# ANSI color helpers
-GREEN = "\033[92m"
-YELLOW = "\033[93m"
-RED = "\033[91m"
-RESET = "\033[0m"
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncGenerator[None, None]:
     print(f"{YELLOW}🚀 Starting server...{RESET}")
+    await init_redis()
     yield
+    await close_redis()
     print(f"{RED}🛑 Shutting down server...{RESET}")
 
 

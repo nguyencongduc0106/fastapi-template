@@ -15,6 +15,7 @@ class AppSettings(BaseSettings):
     POSTGRES_SERVER: str = ""
     POSTGRES_PORT: str = ""
     POSTGRES_DB: str = ""
+    SQL_ECHO: bool = False
 
     @property
     def POSTGRES_URL(self) -> str:
@@ -32,6 +33,7 @@ class AppSettings(BaseSettings):
     JWT_SECRET: str = ""
     JWT_ALGORITHM: str = ""
     JWT_EXPIRE_MINUTES: int = 0
+    JWT_REFRESH_EXPIRE_DAYS: int = 0
 
     model_config = SettingsConfigDict(
         env_file=Path(__file__).resolve().parents[2] / ".env",

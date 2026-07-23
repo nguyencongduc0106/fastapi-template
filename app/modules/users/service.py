@@ -1,22 +1,15 @@
 from uuid import UUID
 
-from app.core.exception import ConflictError, NotFoundError
+from app.core.exception import NotFoundError
 from app.core.security import hash_password
 from app.modules.users.model import User
 from app.modules.users.repository import UserRepository
-from app.modules.users.schema import UserCreate, UserUpdate
+from app.modules.users.schema import UserUpdate
 
 
 class UserService:
     def __init__(self, repo: UserRepository):
         self.repo = repo
-
-    async def create(self, user_create: UserCreate) -> User:
-        if await self.repo.get_by_email(user_create.email):
-            raise ConflictError("User with this email already exists")
-        data = user_create.model_dump(exclude={"password"})
-        data["password_hash"] = hash_password(user_create.password)
-        return await self.repo.create(**data)
 
     async def get(self, user_id: UUID) -> User:
         user = await self.repo.get(user_id)

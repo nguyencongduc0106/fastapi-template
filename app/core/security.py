@@ -1,5 +1,5 @@
 from datetime import UTC, datetime, timedelta
-from typing import Any
+from typing import Any, Literal
 from uuid import uuid4
 
 import jwt
@@ -23,21 +23,33 @@ def verify_password(
     )
 
 
-def create_access_token(payload: dict[str, Any]) -> str:
+def _create_jwt_token(
+    payload: dict[str, Any], type: Literal["access", "refresh"], expire_minutes: int
+) -> str:
+    payload["type"] = type
     return jwt.encode(
         payload={
             **payload,
             "jti": str(uuid4()),
             "iat": datetime.now(UTC),
-            "exp": datetime.now(UTC)
-            + timedelta(minutes=app_settings.JWT_EXPIRE_MINUTES),
+            "exp": datetime.now(UTC) + timedelta(minutes=expire_minutes),
         },
         key=app_settings.JWT_SECRET,
         algorithm=app_settings.JWT_ALGORITHM,
     )
 
 
-def decode_access_token(
+def create_access_token(payload: dict[str, Any]) -> str:
+    return _create_jwt_token(payload, "access", app_settings.JWT_EXPIRE_MINUTES)
+
+
+def create_refresh_token(payload: dict[str, Any]) -> str:
+    return _create_jwt_token(
+        payload, "refresh", app_settings.JWT_REFRESH_EXPIRE_DAYS * 24 * 60
+    )
+
+
+def decode_jwt_token(
     token: str,
 ) -> dict[str, Any]:
     return jwt.decode(

@@ -4,7 +4,7 @@ ALEMBIC := $(UV) alembic
 .PHONY: start migration upgrade downgrade history current lint fix typecheck
 
 start:
-	$(UV) uvicorn app.main:app --reload
+	$(UV) uvicorn app.main:app --reload --no-access-log
 
 migration:
 	$(ALEMBIC) revision --autogenerate -m "$(msg)"
